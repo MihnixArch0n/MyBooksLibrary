@@ -1,0 +1,40 @@
+---
+description: MyBooksLibrary – kiến trúc, stack và quy ước làm việc (local-first manga reader)
+alwaysApply: true
+---
+
+# MyBooksLibrary – Project context
+
+## Tài liệu nguồn
+
+- Đặc tả chức năng và luồng: `docs/BA_Requirements.md` (ưu tiên khi thiết kế feature mới).
+
+## Tech stack
+
+- UI: Kotlin + Jetpack Compose, Material3.
+- Navigation: Navigation Compose (bottom tabs trong `ui/navigation`).
+- Local: Room (KSP) + DataStore (sẽ dùng sau cho auth/theme).
+- Network: Retrofit + OkHttp + Gson; MangaDex base `https://api.mangadex.org/`.
+- Ảnh: Coil (`coil-compose`).
+- Kiến trúc: MVVM + Clean cơ bản – `ui` / `domain` / `data`.
+
+## Cấu trúc thư mục (Kotlin)
+
+- `ui/` – màn hình Compose, theme, navigation, `viewmodel`.
+- `domain/model/` – model dùng trên UI (ví dụ `MangaModel`), không phụ thuộc Android framework.
+- `data/local/` – Room: entities, DAO, `AppDatabase`.
+- `data/remote/` – Retrofit API, `NetworkModule`, DTO trong `data/remote/models`.
+- `data/repository/` – orchestrate local + remote (ví dụ `LibraryRepository`, `MangaRepository`).
+
+## Quy ước khi thêm feature
+
+1. Đọc `docs/BA_Requirements.md` để khớp tab/luồng (Discover, Search, Library, Settings, Auth, Detail, Reader).
+2. API MangaDex: DTO theo `data` / `attributes` / `relationships`; cover art URL chuẩn `https://uploads.mangadex.org/covers/{manga_id}/{file_name}`.
+3. Tránh DI phức tạp trong skeleton hiện tại: có thể `remember { ... }` + Factory ViewModel trong Composable như các tab đã làm; khi dự án lớn hãy cân nhắc Hilt.
+4. Room: entity/DAO/database trong `data/local`; migration khi đổi schema.
+5. Gradle: phiên bản thư viện khai báo trong `gradle/libs.versions.toml`; KSP đã bật – nếu lỗi source set, xem `gradle.properties` (`android.disallowKotlinSourceSets`).
+
+## Git
+
+- Không commit secrets; `local.properties` đã ignore.
+- Ưu tiên commit nhỏ, message rõ (feature/fix/refactor).
